@@ -28,7 +28,7 @@ if __name__ == "__main__":
                     print("2. Login as User")
                     print("3. Register as User")
                     print("4. Exit")
-                    choice = input("")
+                    choice = int(input(""))
                     if choice == 1:
                         exit()
                     elif choice == 2:
