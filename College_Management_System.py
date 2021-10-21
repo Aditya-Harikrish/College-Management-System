@@ -1,12 +1,13 @@
 import subprocess as sp
 import pymysql
 import pymysql.cursors
+import getpass
 
 if __name__ == "__main__":
     while(1):
         tmp = sp.call('clear', shell=True)
         username = input("Username: ")
-        password = input("Password: ")
+        password = getpass.getpass("Password: ")
         try:
             con = pymysql.connect(host='localhost',
                                   port=3306,
