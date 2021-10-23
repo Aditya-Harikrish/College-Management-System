@@ -3,13 +3,49 @@ import pymysql
 import pymysql.cursors
 import getpass
 
+def admin_login(con, cur, admin_id, admin_password):
+    try: 
+        query = "SELECT * FROM Staff WHERE StaffID = %s AND DOB = %s"
+        cur.execute(query, (admin_id, admin_password)) 
+        row = cur.fetchone()
+        if row is None:
+            print("Not Registered\n")
+            return -1
+        else:
+            print("You are logged in.\n")
+            return 1
+    except Exception as e:
+        print("Error: ", e)
+        return -1
+
+def admin(con, cur):
+    return
+
+def user_login(con, cur, user_id, user_password):
+    try: 
+        query = "SELECT * FROM Student WHERE StudentID = %s AND DOB = %s"
+        cur.execute(query, (user_id, user_password)) 
+        row = cur.fetchone()
+        if row is None:
+            print("Not Registered\n")
+            return -1
+        else:
+            print("You are logged in.\n")
+            return 1
+    except Exception as e:
+        print("Error: ", e)
+        return -1
+
+def user(con, cur):
+    return
+
 if __name__ == "__main__":
     while(1):
         tmp = sp.call('clear', shell=True)
         username = input("Username: ")
         password = getpass.getpass("Password: ")
         try:
-            setup = input("Do you want to setup the database? (y/n)")
+            setup = input("Do you want to setup the database? (y/n) ")
             if setup == "y":
                 fd = open('setup.sql', 'r')
                 sqlfile = fd.read()
@@ -48,7 +84,7 @@ if __name__ == "__main__":
                 print("Connected")
             else:
                 print("Failed to connect")
-            tmp = input("Enter any key to CONTINUE>")
+            tmp = input("Enter any key to CONTINUE> ")
             with con.cursor() as cur:
                 while(1):
                     # tmp = sp.call('clear', shell=True)
@@ -59,9 +95,41 @@ if __name__ == "__main__":
                     print("4. Exit")
                     choice = int(input(""))
                     if choice == 1:
-                        tmp = sp.call('clear', shell=True)
+                        while 1:
+                            admin_id = int(input("Enter your id to login as administrator: "))
+                            admin_password = getpass.getpass("Enter your Date of Birth to login as administrator: ")
+                            result = admin_login(con, cur, admin_id, admin_password)
+                            if result == 1:
+                                print("Login Successful")
+                                admin(con, cur)
+                            else:
+                                print("Login Failed")
+                                print("Enter your choice: ")
+                                print("1. Login")
+                                print("2. Go back")
+                                choice = int(input(""))
+                                if choice == 1:
+                                    continue
+                                else:
+                                    break
                     elif choice == 2:
-                        exit()
+                        while 1:
+                            user_id = int(input("Enter your id to login as administrator: "))
+                            user_password = getpass.getpass("Enter your Date of Birth to login as administrator: ")
+                            result = user_login(con, cur, user_id, user_password)
+                            if result == 1:
+                                print("Login Successful")
+                                user(con, cur)
+                            else:
+                                print("Login Failed")
+                                print("Enter your choice: ")
+                                print("1. Login")
+                                print("2. Go back")
+                                choice = int(input(""))
+                                if choice == 1:
+                                    continue
+                                else:
+                                    break
                     elif choice == 3:
                         exit()
                     elif choice == 4:
