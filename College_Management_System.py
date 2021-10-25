@@ -2,6 +2,7 @@ import subprocess as sp
 import pymysql
 import pymysql.cursors
 import getpass
+from functions import *
 
 def admin_login(con, cur, admin_id, admin_password):
     try: 
