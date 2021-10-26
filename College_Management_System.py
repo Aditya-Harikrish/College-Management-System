@@ -24,16 +24,42 @@ def admin_login(admin_id, admin_password):
 
 
 def admin():
-    print("Edit an entity: ")
-    print("1. Student")
-    print("2. Staff")
-    print("3. Course")
-    print("4. Exit")
-    ch = int(input("Enter your choice: "))
-    if ch == 1:
-        student(con, cur)
-    elif ch == 2:
-        staff(con, cur)
+    while True:
+        print("Edit an entity: ")
+        print("1. Student")
+        print("2. Guardian")
+        print("3. Student Contact")
+        print("4. Student Email")
+        print("5. Student Medical Conditions")
+        print("6. Student Emergency Contacts")
+        print("7. Student Courses")
+        print("8. Staff")
+        print("9. Staff Contact Number")
+        print("10. Staff Email")
+        print("11. Staff Medical Conditions")
+        print("12. Staff Designation")
+        print("13. Staff Qualifications")
+        print("14. Teachers")
+        print("15. Teaching Assistants")
+        print("16. Classroom")
+        print("17. Courses in Classroom")
+        print("18. Department")
+        print("19. Works For Department")
+        print("20. Studies in Department")
+        print("21. Course Prerequisites")
+        print("22. Dependents")
+        print("23. Grade")
+        print("24. Teaches")
+        print("25. Part of")
+        print("26. Mentors")
+        print("27. Lecture")
+        print("3. Course")
+        print("4. Exit")
+        ch = int(input("Enter your choice: "))
+        if ch == 1:
+            student(con, cur)
+        elif ch == 2:
+            staff(con, cur)
 
 
 def user_login(user_id, user_password):

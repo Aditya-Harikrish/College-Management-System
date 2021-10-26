@@ -11,7 +11,8 @@ def student(con, cursor):
         print("8. Find the average number of courses of all students who enrolled in a particular year.")
         print("9. Search for students from Mumbai.")
         print("10. Get the grade of a student (A, B, C, D or F) based on the grades the student has earned in his/her respective courses")
-        print("11. Go Back")
+        print("11. Calculate and list the name and CGPA of all students using the grade they obtain in a course and the number of credits for the course")
+        print("12. Go Back")
         choice = int(input("Enter your choice: "))
         if choice == 1:
             try:
@@ -304,6 +305,23 @@ def student(con, cursor):
                 print(e)
                 continue
         elif choice == 11:
+            query = """ SELECT Grade.StudentID, Student.FirstName, Student.LastName , Grade.CourseID, Grade.Grade, Course.Credits, ( IF (Grade > 9.0,'A',IF (Grade > 8.0,'B',IF (Grade > 7.0,'C', IF (Grade > 6.0,'D', 'F') )  ) )) AS AlphaGrade
+                        FROM Grade
+                        LEFT JOIN Course
+                        ON Grade.CourseID = Course.CourseID 
+                        LEFT JOIN Student
+                        ON Grade.StudentID =  Student.StudentID
+                    """
+            cursor.execute(query)
+            result = cursor.fetchall()
+            if result is None:
+                print("No Students")
+                continue
+            for row in result:
+                for k, v in row.items():
+                    print(k, v)
+                print("")
+        elif choice == 12:
             return
         else:
             print("Invalid choice")
