@@ -230,7 +230,7 @@ def staff(con, cursor):
 
         elif choice == 5:
             try:
-                query = "SELECT * FROM Student"
+                query = "SELECT * FROM Staff"
                 cursor.execute(query)
                 result = cursor.fetchall()
                 for row in result:
