@@ -261,40 +261,48 @@ def student(con, cursor):
             for row in result:
                 print(row['FirstName'], row['LastName'])
         elif choice == 10:
-            query = """CREATE TABLE AlphGrade (
-                        StudentID int UNSIGNED,
-                        FirstName varchar(50),
-                        LastName varchar(50),
-                        CourseID varchar(6),
-                        Grade real,
-                        AlphGrade varchar(1) AS ( IF (Grade > 9.0,'A',IF (Grade > 8.0,'B',IF (Grade > 7.0,'C', IF (Grade > 6.0,'D', 'F') )  ) ))  ,
-                        Credits int UNSIGNED
-                    """
-            cursor.execute(query)
-            query = """ INSERT INTO AlphGrade (StudentID,FirstName,LastName,CourseID,Grade,Credits)
-                        SELECT Grade.StudentID, Student.FirstName, Student.LastName , Grade.CourseID, Grade.Grade, Course.Credits
-                        FROM Grade
-                        LEFT JOIN Course
-                        ON Grade.CourseID = Course.CourseID 
-                        LEFT JOIN Student
-                        ON Grade.StudentID =  Student.StudentID
-                    """
-            cursor.execute(query)
-            query = "SELECT * FROM AlphGrade"
-            cursor.execute(query)
-            result = cursor.fetchall()
-            if result is None:
-                print("No Students")
+            try:
+                query = """CREATE TABLE AlphGrade (
+                            StudentID int UNSIGNED,
+                            FirstName varchar(50),
+                            LastName varchar(50),
+                            CourseID varchar(6),
+                            Grade real,
+                            AlphGrade varchar(1) AS ( IF (Grade > 9.0,'A',IF (Grade > 8.0,'B',IF (Grade > 7.0,'C', IF (Grade > 6.0,'D', 'F') )  ) ))  ,
+                            Credits int UNSIGNED
+                        """
+                cursor.execute(query)
+                query = """ INSERT INTO AlphGrade (StudentID,FirstName,LastName,CourseID,Grade,Credits)
+                            SELECT Grade.StudentID, Student.FirstName, Student.LastName , Grade.CourseID, Grade.Grade, Course.Credits
+                            FROM Grade
+                            LEFT JOIN Course
+                            ON Grade.CourseID = Course.CourseID 
+                            LEFT JOIN Student
+                            ON Grade.StudentID =  Student.StudentID
+                        """
+                cursor.execute(query)
+                query = "SELECT * FROM AlphGrade"
+                cursor.execute(query)
+                result = cursor.fetchall()
+                if result is None:
+                    print("No Students")
+                    continue
+                for row in result:
+                    print("StudentID: ", row["StudentID"])
+                    print("FirstName: ", row["FirstName"])
+                    print("LastName: ", row["LastName"])
+                    print("CourseID: ", row["CourseID"])
+                    print("Grade: ", row["Grade"])
+                    print("Credits: ", row["Credits"])
+                    print("AlphGrade: ", row["AlphGrade"])
+                    print("")
+                query = "DROP TABLE AlphGrade"
+                cursor.execute(query)
+                con.commit()
+            except Exception as e:
+                con.rollback()
+                print(e)
                 continue
-            for row in result:
-                print("StudentID: ", row["StudentID"])
-                print("FirstName: ", row["FirstName"])
-                print("LastName: ", row["LastName"])
-                print("CourseID: ", row["CourseID"])
-                print("Grade: ", row["Grade"])
-                print("Credits: ", row["Credits"])
-                print("AlphGrade: ", row["AlphGrade"])
-                print("")
         elif choice == 11:
             return
         else:
