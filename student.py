@@ -112,6 +112,7 @@ def student(con, cursor):
                         break
                 con.commit()
                 print("Student added successfully")
+
             except Exception as e:
                 con.rollback()
                 print(e)
@@ -149,7 +150,7 @@ def student(con, cursor):
                     continue
                 print("\nUpdate Student Information")
                 print(
-                    "Press ENTER if no update is required, otherwise enter the new value: ")
+                    "Press ENTER if no update is required, otherwise enter the new value.\n")
                 upd_row['FirstName'] = input("1. First Name: ")
                 if upd_row['FirstName'] == '':
                     upd_row['FirstName'] = result['FirstName']

@@ -41,25 +41,27 @@ def admin():
         print("13. Staff Qualifications")
         print("14. Teachers")
         print("15. Teaching Assistants")
-        print("16. Classroom")
-        print("17. Courses in Classroom")
+        # print("16. Classroom")
+        # print("17. Courses in Classroom")
         print("18. Department")
         print("19. Works For Department")
         print("20. Studies in Department")
-        print("21. Course Prerequisites")
+        # print("21. Course Prerequisites")
         print("22. Dependents")
         print("23. Grade")
         print("24. Teaches")
         print("25. Part of")
         print("26. Mentors")
         print("27. Lecture")
-        print("3. Course")
-        print("4. Exit")
+        print("28. Courses and Classrooms")
+        print("29. Exit")
         ch = int(input("Enter your choice: "))
         if ch == 1:
             student(con, cur)
-        elif ch == 2:
+        elif ch == 28:
             staff(con, cur)
+        elif ch == 29:
+            course(con, cur)
 
 
 def user_login(user_id, user_password):
