@@ -1,4 +1,3 @@
-
 def course(con, cursor):
     while True:
         print("\Courses And Classrooms")

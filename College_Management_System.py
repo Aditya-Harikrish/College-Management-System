@@ -34,34 +34,29 @@ def admin():
         print("6. Student Emergency Contacts")
         print("7. Student Courses")
         print("8. Staff")
-        print("9. Staff Contact Number")
-        print("10. Staff Email")
-        print("11. Staff Medical Conditions")
-        print("12. Staff Designation")
-        print("13. Staff Qualifications")
-        print("14. Teachers")
-        print("15. Teaching Assistants")
-        # print("16. Classroom")
-        # print("17. Courses in Classroom")
-        print("18. Department")
-        print("19. Works For Department")
-        print("20. Studies in Department")
-        # print("21. Course Prerequisites")
-        print("22. Dependents")
-        print("23. Grade")
-        print("24. Teaches")
-        print("25. Part of")
-        print("26. Mentors")
-        print("27. Lecture")
-        print("28. Courses and Classrooms")
-        print("29. Exit")
+        print("9. Course")
+        print("10. Exit")
         ch = int(input("Enter your choice: "))
         if ch == 1:
             student(con, cur)
-        elif ch == 28:
+        elif ch == 2:
+            guardian(con, cur)
+        elif ch == 3:
+            student_contact(con, cur)
+        elif ch == 4:
+            student_email(con, cur)
+        elif ch == 5:
+            student_medical_conditions(con, cur)
+        elif ch == 6:
+            student_emergency(con, cur)
+        elif ch == 7:
+            Student_Courses(con, cur)
+        elif ch == 8:
             staff(con, cur)
-        elif ch == 29:
+        elif ch == 9:
             course(con, cur)
+        elif ch == 10:
+            break
 
 
 def user_login(user_id, user_password):
