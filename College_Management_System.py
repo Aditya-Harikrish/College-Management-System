@@ -6,10 +6,11 @@ from staff import *
 from student import *
 from course import *
 
+
 def admin_login(admin_id, admin_password):
-    try: 
+    try:
         query = "SELECT * FROM Staff WHERE StaffID = %s AND DOB = %s"
-        cur.execute(query, (admin_id, admin_password)) 
+        cur.execute(query, (admin_id, admin_password))
         row = cur.fetchone()
         if row is None:
             print("Not Registered\n")
@@ -20,6 +21,7 @@ def admin_login(admin_id, admin_password):
     except Exception as e:
         print("Error: ", e)
         return -1
+
 
 def admin():
     print("Edit an entity: ")
@@ -33,10 +35,11 @@ def admin():
     elif ch == 2:
         staff(con, cur)
 
+
 def user_login(user_id, user_password):
-    try: 
+    try:
         query = "SELECT * FROM Student WHERE StudentID = %s AND DOB = %s"
-        cur.execute(query, (user_id, user_password)) 
+        cur.execute(query, (user_id, user_password))
         row = cur.fetchone()
         if row is None:
             print("Not Registered\n")
@@ -48,8 +51,10 @@ def user_login(user_id, user_password):
         print("Error: ", e)
         return -1
 
+
 def user(con, cur):
     return
+
 
 while(1):
     tmp = sp.call('clear', shell=True)
@@ -57,11 +62,11 @@ while(1):
     password = getpass.getpass("Password: ")
     try:
         con = pymysql.connect(host='localhost',
-                                port=3306,
-                                user=username,
-                                password=password,
-                                db='COLLEGE_MANAGEMENT_SYSTEM',
-                                cursorclass=pymysql.cursors.DictCursor)
+                              port=3306,
+                              user=username,
+                              password=password,
+                              db='COLLEGE_MANAGEMENT_SYSTEM',
+                              cursorclass=pymysql.cursors.DictCursor)
         tmp = sp.call('clear', shell=True)
         if(con.open):
             print("Connected")
@@ -79,8 +84,10 @@ while(1):
                 choice = int(input(""))
                 if choice == 1:
                     while 1:
-                        admin_id = int(input("Enter your id to login as administrator: "))
-                        admin_password = getpass.getpass("Enter your Date of Birth to login as administrator: ")
+                        admin_id = int(
+                            input("Enter your id to login as administrator: "))
+                        admin_password = getpass.getpass(
+                            "Enter your Date of Birth to login as administrator: ")
                         result = admin_login(admin_id, admin_password)
                         if result == 1:
                             print("Login Successful")
@@ -97,8 +104,10 @@ while(1):
                                 break
                 elif choice == 2:
                     while 1:
-                        user_id = int(input("Enter your id to login as administrator: "))
-                        user_password = getpass.getpass("Enter your Date of Birth to login as administrator: ")
+                        user_id = int(
+                            input("Enter your id to login as administrator: "))
+                        user_password = getpass.getpass(
+                            "Enter your Date of Birth to login as administrator: ")
                         result = user_login(user_id, user_password)
                         if result == 1:
                             print("Login Successful")
