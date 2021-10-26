@@ -134,7 +134,7 @@ CREATE TABLE StaffMedicalConditions (
 
 CREATE TABLE Staff_Qualifications (
     StaffID int UNSIGNED,
-    Qualifications varchar(500) CHECK(Qualifications REGEXP '^[A-Za-z0-9 ]+$'),
+    Qualifications varchar(500) CHECK(Qualifications REGEXP '^[A-Za-z0-9 ,]+$'),
     PRIMARY KEY(StaffID, Qualifications)
 );
 
@@ -245,13 +245,13 @@ CREATE TABLE Teaches (
     PRIMARY KEY(StudentID, StaffID)
 );
 
-CREATE TABLE Enrolled (
-    StudentID int UNSIGNED,
-    -- check
-    CourseID varchar(6),
-    -- check
-    PRIMARY KEY(StudentID, CourseID)
-);
+-- CREATE TABLE Enrolled (
+--     StudentID int UNSIGNED,
+--     -- check
+--     CourseID varchar(6),
+--     -- check
+--     PRIMARY KEY(StudentID, CourseID)
+-- );
 
 CREATE TABLE Partof (
     TeacherHOD_ID int UNSIGNED,
@@ -400,10 +400,10 @@ DELETE FROM
 WHERE
     StudentID = OLD.StudentID;
 
-DELETE FROM
-    Enrolled
-WHERE
-    StudentID = OLD.StudentID;
+-- DELETE FROM
+--     Enrolled
+-- WHERE
+--     StudentID = OLD.StudentID;
 
 DELETE FROM
     MentorAStudent
@@ -530,7 +530,7 @@ WHERE
 DELETE FROM
     MentorAStudent
 WHERE
-    StaffID = OLD.StaffID;
+    TeacherID = OLD.StaffID;
 
 DELETE FROM
     Lecture
@@ -546,28 +546,28 @@ WHERE
 END //
 DELIMITER ;
 
-DELIMITER //
-CREATE TRIGGER TeacherInsert
-BEFORE
-    INSERT ON Teacher FOR EACH ROW BEGIN
-DECLARE myvar BIGINT;
--- DECLARE this_staff_id BIGINT;
-SELECT NEW.StaffID INTO @this_staff_id;
-\! echo 'some text';
-SELECT COUNT(*) INTO myvar FROM Staff WHERE StaffID = this_staff_id;
-IF ((myvar) = 0) THEN
-    signal sqlstate '45000' set message_text = 'Error: No Staff Found With That StaffID';
--- ELSEIF CoursesTeachingID NOT IN (SELECT CourseID FROM Course) THEN
---     signal sqlstate '45000' set message_text = 'Error: No Course Found With That CourseID';
-END IF;
-
--- IF StaffID NOT IN (SELECT StaffID FROM Staff) THEN
+-- DELIMITER //
+-- CREATE TRIGGER TeacherInsert
+-- BEFORE
+--     INSERT ON Teacher FOR EACH ROW BEGIN
+-- DECLARE myvar BIGINT;
+-- -- DECLARE this_staff_id BIGINT;
+-- SELECT NEW.StaffID INTO @this_staff_id;
+-- \! echo 'some text';
+-- SELECT COUNT(*) INTO myvar FROM Staff WHERE StaffID = this_staff_id;
+-- IF ((myvar) = 0) THEN
 --     signal sqlstate '45000' set message_text = 'Error: No Staff Found With That StaffID';
--- ELSEIF CoursesTeachingID NOT IN (SELECT CourseID FROM Course) THEN
---     signal sqlstate '45000' set message_text = 'Error: No Course Found With That CourseID';
+-- -- ELSEIF CoursesTeachingID NOT IN (SELECT CourseID FROM Course) THEN
+-- --     signal sqlstate '45000' set message_text = 'Error: No Course Found With That CourseID';
 -- END IF;
-END //
-DELIMITER ;
+
+-- -- IF StaffID NOT IN (SELECT StaffID FROM Staff) THEN
+-- --     signal sqlstate '45000' set message_text = 'Error: No Staff Found With That StaffID';
+-- -- ELSEIF CoursesTeachingID NOT IN (SELECT CourseID FROM Course) THEN
+-- --     signal sqlstate '45000' set message_text = 'Error: No Course Found With That CourseID';
+-- -- END IF;
+-- END //
+-- DELIMITER ;
 
 
 /* Student */
@@ -628,10 +628,30 @@ VALUES
 (1, 91, 9874563651);
 
 INSERT INTO
+    StudentContactNumber
+VALUES
+(2, 91, 9579963602);
+
+INSERT INTO
+    StudentContactNumber
+VALUES
+(3, 91, 8764563612);
+-- 
+INSERT INTO
     StudentEmailID
 VALUES
 (1, 'mybigbishop@hotmail.com');
 
+INSERT INTO
+    StudentEmailID
+VALUES
+(2, 'badassadi@gmail.com');
+
+INSERT INTO
+    StudentEmailID
+VALUES
+(3, 'pranilucifer@hotmail.com');
+-- 
 INSERT INTO
     Student_MedicalConditions
 VALUES
@@ -643,9 +663,44 @@ VALUES
     (1, 'Priya Rani', 91, 4456789234);
 
 INSERT INTO
+    Student_Emergency
+VALUES
+    (2, 'Rahul Tewatia', 91, 6908374212);
+
+INSERT INTO
+    Student_Emergency
+VALUES
+    (1, 'Aamuktamalyada', 91, 9082917462);
+
+INSERT INTO
     Student_Courses
 VALUES
-    (1, 'CS106');
+    (1, 'CS01.3');
+
+INSERT INTO
+    Student_Courses
+VALUES
+    (1, 'DSA1.3');
+
+INSERT INTO
+    Student_Courses
+VALUES
+    (2, 'DSA1.3');
+
+INSERT INTO
+    Student_Courses
+VALUES
+    (2, 'ISS1.3');
+
+INSERT INTO
+    Student_Courses
+VALUES
+    (3, 'CS01.3');
+
+INSERT INTO
+    Student_Courses
+VALUES
+    (3, 'ISS1.3');
 
 /* Guardian */
 INSERT INTO
@@ -752,6 +807,141 @@ VALUES
     );
 
 INSERT INTO
+    StaffContactNumber
+VALUES
+(1, 91, 9473829561);
+
+INSERT INTO
+    StaffContactNumber
+VALUES
+(2, 91, 9473837719);
+
+INSERT INTO
+    StaffContactNumber
+VALUES
+(3, 91, 8673829599);
+
+INSERT INTO
+    StaffEmailID
+VALUES
+(1, 'mymail@hotmail.com');
+
+INSERT INTO
+    StaffEmailID
+VALUES
+(2, 'dryrun@gmail.com');
+
+INSERT INTO
+    StaffEmailID
+VALUES
+(3, 'zindabad@hotmail.com');
+-- 
+INSERT INTO
+    StaffDesignation
+VALUES
+(1, 'Support staff');
+
+INSERT INTO
+    StaffDesignation
+VALUES
+(2, 'Teacher');
+
+INSERT INTO
+    StaffDesignation
+VALUES
+(3, 'Teacher');
+
+INSERT INTO
+    StaffDesignation
+VALUES
+(4, 'Teaching Assistant');
+
+INSERT INTO
+    StaffMedicalConditions
+VALUES
+    (3, 'Arthiritis');
+
+INSERT INTO
+    StaffMedicalConditions
+VALUES
+    (2, 'Hypertension');
+
+INSERT INTO
+    Staff_Qualifications
+VALUES
+    (1, 'MBA');
+
+INSERT INTO
+    Staff_Qualifications
+VALUES
+    (2, 'BSc , BEd');
+
+INSERT INTO
+    Staff_Qualifications
+VALUES
+    (3, 'BSc , MSc in Natural Sciences');
+
+INSERT INTO
+    Teacher
+VALUES
+    (2,'CS01.3');
+
+INSERT INTO
+    Teacher
+VALUES
+    (3,'DSA1.3');
+
+INSERT INTO
+    Teacher
+VALUES
+    (3,'ISS1.3');
+
+INSERT INTO
+    TeachingAssistant
+VALUES
+    (4, 1, "ISS1.3");
+
+INSERT INTO
+    Classroom
+VALUES
+    (10001,'GyanBhavan');
+
+INSERT INTO
+    CoursesInClassroom
+VALUES
+    (10001,'DSA1.3');
+
+INSERT INTO
+    CoursesInClassroom
+VALUES
+    (10001,'ISS1.3');
+
+INSERT INTO
+    CoursesInClassroom
+VALUES
+    (10001,'CS01.3');
+
+INSERT INTO
+    Department
+VALUES
+    (1001,'Science Department',2);
+
+INSERT INTO
+    WorksForDepartment
+VALUES
+    (1001,2);
+
+INSERT INTO
+    WorksForDepartment
+VALUES
+    (1001,3);
+
+INSERT INTO
+    StudiesInDepartment
+VALUES
+    (1001,3);
+
+INSERT INTO
     Course
 VALUES
     ('CSO1.3', 2);
@@ -767,6 +957,84 @@ VALUES
     ('DSA1.3', 2);
 
 INSERT INTO
-    TeachingAssistant
+    CoursePrerequisites
 VALUES
-    (4, 1, "ISS1.3");
+    ('ISS1.3', 'DSA1.3');
+
+INSERT INTO
+    Dependent
+VALUES
+    (
+        1,
+        'Murali',
+        'Krishna',
+        91,
+        9002341137,
+        "murali@gmail.com",
+        "Medak, Telangana"
+    );
+
+INSERT INTO
+    Dependent
+VALUES
+    (
+        2,
+        'Jaya',
+        'Durga',
+        91,
+        9674911939,
+        "jayadurga@gmail.com",
+        "Kolkata, West Bengal"
+    );
+
+INSERT INTO
+    Grade
+VALUES
+    (9.7,'CSO1.3', 2);
+
+INSERT INTO
+    Grade
+VALUES
+    (9.3,'CSO1.3', 1);
+
+INSERT INTO
+    Grade
+VALUES
+    (9.5,'CSO1.3', 3);
+
+INSERT INTO Teaches (StudentID,StaffID)
+SELECT DISTINCT Student_Courses.StudentID , Teacher.StaffID
+FROM Student_Courses
+INNER JOIN Teacher
+ON Student_Courses.CoursesStudyingID = Teacher.CoursesTeachingID;
+
+INSERT INTO Partof (TeacherHOD_ID,TeacherMember_ID,DepartmentID)
+SELECT DISTINCT Department.HOD_ID,WorksForDepartment.StaffID,Department.DepartmentID
+FROM Department
+LEFT JOIN WorksForDepartment
+ON Department.DepartmentID = WorksForDepartment.DepartmentID;
+
+INSERT INTO MentorAStudent (StudentID,TeacherID,DepartmentID)
+SELECT DISTINCT StudiesInDepartment.StudentID,WorksForDepartment.StaffID,StudiesInDepartment.DepartmentID
+FROM StudiesInDepartment
+LEFT JOIN WorksForDepartment
+ON StudiesInDepartment.DepartmentID = WorksForDepartment.DepartmentID;
+
+
+INSERT INTO Lecture (StudentID,TeacherID,CourseID,ClassroomID)
+SELECT DISTINCT Student_Courses.StudentID,Teacher.StaffID, Student_Courses.CoursesStudyingID, CoursesInClassroom.ClassroomID
+FROM Student_Courses
+LEFT JOIN Teacher
+ON Student_Courses.CoursesStudyingID = Teacher.CoursesTeachingID
+LEFT JOIN CoursesInClassroom
+ON Student_Courses.CoursesStudyingID = CoursesInClassroom.CourseID;
+
+INSERT INTO InvolvedInACourse (StudentID,TeacherID,CourseID,TeachingAssistantStaffID)
+SELECT DISTINCT Student_Courses.StudentID,Teacher.StaffID, Student_Courses.CoursesStudyingID, TeachingAssistant.StaffID
+FROM Student_Courses
+LEFT JOIN Teacher
+ON Student_Courses.CoursesStudyingID = Teacher.CoursesTeachingID
+LEFT JOIN TeachingAssistant
+ON Student_Courses.CoursesStudyingID = TeachingAssistant.CourseID
+WHERE TeachingAssistant.StaffID IS NOT NULL;
+
