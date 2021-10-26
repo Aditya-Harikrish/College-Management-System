@@ -31,14 +31,12 @@ def student(con, cursor):
                 house = input("Enter the Student's House: ")
                 cursor.execute(query, (student_id, first_name, second_name, year, stream,
                                        address, aadhaar, number_of_courses, dob, enrollment_date, house))
-                number = input("Enter the Student's number (code number): ")
-                num_list = number.split(' ')
-                if(len(num_list) == 1):
+                num = input("Enter the Student's number: ")
+                code = input("Enter the Student's Telephone Code: ")
+                if code == '':
                     code = 91
-                    num = int(num_list[0])
                 else:
-                    code = int(num_list[0])
-                    num = int(num_list[1])
+                    code = int(code)
                 query = "INSERT INTO StudentContactNumber VALUES (%s, %s, %s)"
                 cursor.execute(query, (student_id, code, num))
                 email_id = input("Enter the Student's EmailID: ")
@@ -98,8 +96,11 @@ def student(con, cursor):
                         second_name = input(
                             "Enter the Guardian's Second Name: ")
                         address = input("Enter the Guardian's Address: ")
-                        code = int(
-                            input("Enter the Guardian's Telephone Code: "))
+                        code = input("Enter the Guardian's Telephone Code: ")
+                        if code == '':
+                            code = 91
+                        else:
+                            code = int(code)
                         number = int(
                             input("Enter the Guardian's Telephone Number: "))
                         email_id = input("Enter the Guardian's EmailID: ")
@@ -280,7 +281,11 @@ def guardian(con, cursor):
                 first_name = input("Enter the Guardian's First Name: ")
                 second_name = input("Enter the Guardian's Second Name: ")
                 address = input("Enter the Guardian's Address: ")
-                code = int(input("Enter the Guardian's Telephone Code: "))
+                code = input("Enter the Guardian's Telephone Code: ")
+                if code == '':
+                    code = 91
+                else:
+                    code = int(code)
                 number = int(input("Enter the Guardian's Telephone Number: "))
                 email_id = input("Enter the Guardian's EmailID: ")
                 cursor.execute(query, (first_name, second_name,
@@ -574,6 +579,92 @@ def student_medical_conditions(con, cursor):
         print("3. Update Student Medical Conditions")
         print("4. View Medical Conditions of a Student")
         print("5. View all Medical Condition Information")
+        print("6. Go Back")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            try:
+                query = "INSERT INTO Student_MedicalConditions VALUES (%s, %s)"
+                student_id = int(input("Enter Student ID: "))
+                medi = input("Enter the Student's Medical Conditions: ")
+                cursor.execute(query, (student_id, medi))
+                con.commit()
+                print("Student's Medical Conditions added successfully")
+            except Exception as e:
+                con.rollback()
+                print(e)
+                continue
+        elif choice == 2:
+            try:
+                student_id = int(input("Enter Student ID: "))
+                medi = input("Enter the Student's Medical Conditions: ")
+                query = "DELETE FROM Student_MedicalConditions WHERE MedicalConditions = %s AND StudentID = %s"
+                cursor.execute(query, (medi, student_id))
+                con.commit()
+                print("Student's Medical Conditions deleted successfully")
+            except Exception as e:
+                con.rollback()
+                print(e)
+                continue
+        elif choice == 3:
+            try:
+                student_id = int(input("Enter Student ID: "))
+                medi = input("Enter the Student's Medical Conditions: ")
+                upd_row = dict()
+                query = "SELECT * FROM Student_MedicalConditions WHERE MedicalConditions = %s AND StudentID = %s"
+                cursor.execute(query, (medi, student_id))
+                result = cursor.fetchone()
+                if result == None:
+                    print("Medical Condition does not exist")
+                    continue
+                print("Medical Condition Information: ")
+                print(
+                    "Press ENTER if no update is required, otherwise enter the new value: ")
+                upd_row['MedicalConditions'] = input("Medical Conditions: ")
+                if upd_row['MedicalConditions'] == '':
+                    upd_row['MedicalConditions'] = result['MedicalConditions']
+                query = "UPDATE Student_MedicalConditions SET MedicalConditions = %s WHERE MedicalConditions = %s AND StudentID = %s"
+                cursor.execute(query, (upd_row['MedicalConditions'], medi, student_id))
+                con.commit()
+                print("Medical Conditions updated successfully")
+            except Exception as e:
+                con.rollback()
+                print(e)
+                continue
+        elif choice == 4:
+            student_id = int(input("Enter Student ID: "))
+            query = "SELECT * FROM Student_MedicalConditions WHERE StudentID = %s"
+            cursor.execute(query, (student_id))
+            result = cursor.fetchall()
+            if result == None:
+                print("Medical Condition does not exist")
+                continue
+            print("Medical Condition Information: ")
+            for row in result:
+                print("Medical Condition:", row['MedicalConditions'])
+        elif choice == 5:
+            student_id = int(input("Enter Student ID: "))
+            email = input("Enter the Student's Email ID: ")
+            query = "SELECT * FROM Student_MedicalConditions;"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            if result == None:
+                print("Email does not exist")
+                continue
+            else:
+                for row in result:
+                    print("Student ID:", row['StudentID'])
+                    print("Medical Condition:", row['MedicalConditions'])
+        elif choice == 6:
+            return
+        else:
+            print("Invalid choice")
+
+def student_medical_conditions(con, cursor):
+    while True:
+        print("1. Add Student Courses")
+        print("2. Delete Student Courses")
+        print("3. Update Student Courses")
+        print("4. View Courses of a Student")
         print("6. Go Back")
         choice = int(input("Enter your choice: "))
         if choice == 1:
