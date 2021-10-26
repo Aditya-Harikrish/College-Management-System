@@ -241,7 +241,7 @@ def staff(con, cursor):
                 continue
 
         elif choice == 6:
-            exit()
+            return
 
         elif choice == 7:
             try:
