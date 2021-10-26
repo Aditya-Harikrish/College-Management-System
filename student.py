@@ -10,7 +10,8 @@ def student(con, cursor):
         print("7. Retrieve the Names of Students with more than 4 courses")
         print("8. Find the average number of courses of all students who enrolled in a particular year.")
         print("9. Search for students from Mumbai.")
-        print("10. Go Back")
+        print("10. Get the grade of a student (A, B, C, D or F) based on the grades the student has earned in his/her respective courses")
+        print("11. Go Back")
         choice = int(input("Enter your choice: "))
         if choice == 1:
             try:
@@ -260,6 +261,41 @@ def student(con, cursor):
             for row in result:
                 print(row['FirstName'], row['LastName'])
         elif choice == 10:
+            query = """CREATE TABLE AlphGrade (
+                        StudentID int UNSIGNED,
+                        FirstName varchar(50),
+                        LastName varchar(50),
+                        CourseID varchar(6),
+                        Grade real,
+                        AlphGrade varchar(1) AS ( IF (Grade > 9.0,'A',IF (Grade > 8.0,'B',IF (Grade > 7.0,'C', IF (Grade > 6.0,'D', 'F') )  ) ))  ,
+                        Credits int UNSIGNED
+                    """
+            cursor.execute(query)
+            query = """ INSERT INTO AlphGrade (StudentID,FirstName,LastName,CourseID,Grade,Credits)
+                        SELECT Grade.StudentID, Student.FirstName, Student.LastName , Grade.CourseID, Grade.Grade, Course.Credits
+                        FROM Grade
+                        LEFT JOIN Course
+                        ON Grade.CourseID = Course.CourseID 
+                        LEFT JOIN Student
+                        ON Grade.StudentID =  Student.StudentID
+                    """
+            cursor.execute(query)
+            query = "SELECT * FROM AlphGrade"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            if result is None:
+                print("No Students")
+                continue
+            for row in result:
+                print("StudentID: ", row["StudentID"])
+                print("FirstName: ", row["FirstName"])
+                print("LastName: ", row["LastName"])
+                print("CourseID: ", row["CourseID"])
+                print("Grade: ", row["Grade"])
+                print("Credits: ", row["Credits"])
+                print("AlphGrade: ", row["AlphGrade"])
+                print("")
+        elif choice == 11:
             return
         else:
             print("Invalid choice")
@@ -388,6 +424,7 @@ def guardian(con, cursor):
         else:
             print("Invalid choice")
 
+
 def student_contact(con, cursor):
     while True:
         print("1. Add Student Contact Number")
@@ -451,7 +488,8 @@ def student_contact(con, cursor):
                 else:
                     upd_row['CountryCode'] = int(upd_row['CountryCode'])
                 query = "UPDATE StudentContactNumber SET PhoneNumber = %s, CountryCode = %s WHERE PhoneNumber = %s AND StudentID = %s"
-                cursor.execute(query, (upd_row['PhoneNumber'], upd_row['CountryCode'], num, student_id))
+                cursor.execute(
+                    query, (upd_row['PhoneNumber'], upd_row['CountryCode'], num, student_id))
                 con.commit()
                 print("Contact updated successfully")
             except Exception as e:
@@ -485,6 +523,7 @@ def student_contact(con, cursor):
             return
         else:
             print("Invalid choice")
+
 
 def student_email(con, cursor):
     while True:
@@ -572,6 +611,7 @@ def student_email(con, cursor):
         else:
             print("Invalid choice")
 
+
 def student_medical_conditions(con, cursor):
     while True:
         print("1. Add Student Medical Conditions")
@@ -623,7 +663,8 @@ def student_medical_conditions(con, cursor):
                 if upd_row['MedicalConditions'] == '':
                     upd_row['MedicalConditions'] = result['MedicalConditions']
                 query = "UPDATE Student_MedicalConditions SET MedicalConditions = %s WHERE MedicalConditions = %s AND StudentID = %s"
-                cursor.execute(query, (upd_row['MedicalConditions'], medi, student_id))
+                cursor.execute(
+                    query, (upd_row['MedicalConditions'], medi, student_id))
                 con.commit()
                 print("Medical Conditions updated successfully")
             except Exception as e:
@@ -659,22 +700,23 @@ def student_medical_conditions(con, cursor):
         else:
             print("Invalid choice")
 
-def student_medical_conditions(con, cursor):
+
+def Student_Courses(con, cursor):
     while True:
         print("1. Add Student Courses")
         print("2. Delete Student Courses")
         print("3. Update Student Courses")
         print("4. View Courses of a Student")
-        print("6. Go Back")
+        print("5. Go Back")
         choice = int(input("Enter your choice: "))
         if choice == 1:
             try:
-                query = "INSERT INTO Student_MedicalConditions VALUES (%s, %s)"
+                query = "INSERT INTO Student_Courses VALUES (%s, %s)"
                 student_id = int(input("Enter Student ID: "))
-                medi = input("Enter the Student's Medical Conditions: ")
-                cursor.execute(query, (student_id, medi))
+                course = input("Enter the Student's Course Number: ")
+                cursor.execute(query, (student_id, course))
                 con.commit()
-                print("Student's Medical Conditions added successfully")
+                print("Student's Courses added successfully")
             except Exception as e:
                 con.rollback()
                 print(e)
@@ -682,11 +724,11 @@ def student_medical_conditions(con, cursor):
         elif choice == 2:
             try:
                 student_id = int(input("Enter Student ID: "))
-                medi = input("Enter the Student's Medical Conditions: ")
-                query = "DELETE FROM Student_MedicalConditions WHERE MedicalConditions = %s AND StudentID = %s"
-                cursor.execute(query, (medi, student_id))
+                course = input("Enter the Student's Courses: ")
+                query = "DELETE FROM Student_Courses WHERE CoursesStudyingID = %s AND StudentID = %s"
+                cursor.execute(query, (course, student_id))
                 con.commit()
-                print("Student's Medical Conditions deleted successfully")
+                print("Student's Courses deleted successfully")
             except Exception as e:
                 con.rollback()
                 print(e)
@@ -694,52 +736,147 @@ def student_medical_conditions(con, cursor):
         elif choice == 3:
             try:
                 student_id = int(input("Enter Student ID: "))
-                medi = input("Enter the Student's Medical Conditions: ")
+                course = input("Enter the Student's Courses: ")
                 upd_row = dict()
-                query = "SELECT * FROM Student_MedicalConditions WHERE MedicalConditions = %s AND StudentID = %s"
-                cursor.execute(query, (medi, student_id))
+                query = "SELECT * FROM Student_Courses WHERE CoursesStudyingID = %s AND StudentID = %s"
+                cursor.execute(query, (course, student_id))
                 result = cursor.fetchone()
                 if result == None:
-                    print("Medical Condition does not exist")
+                    print("Course does not exist")
                     continue
-                print("Medical Condition Information: ")
+                print("Course Information: ")
                 print(
                     "Press ENTER if no update is required, otherwise enter the new value: ")
-                upd_row['MedicalConditions'] = input("Medical Conditions: ")
-                if upd_row['MedicalConditions'] == '':
-                    upd_row['MedicalConditions'] = result['MedicalConditions']
-                query = "UPDATE Student_MedicalConditions SET MedicalConditions = %s WHERE MedicalConditions = %s AND StudentID = %s"
-                cursor.execute(query, (upd_row['MedicalConditions'], medi, student_id))
+                upd_row['Course'] = input("Course: ")
+                if upd_row['Course'] == '':
+                    upd_row['Course'] = result['CoursesStudyingID']
+                query = "UPDATE Student_Courses SET CoursesStudyingID = %s WHERE MedicalConditions = %s AND StudentID = %s"
+                cursor.execute(
+                    query, (upd_row['MedicalConditions'], course, student_id))
                 con.commit()
-                print("Medical Conditions updated successfully")
+                print("Courses updated successfully")
             except Exception as e:
                 con.rollback()
                 print(e)
                 continue
         elif choice == 4:
             student_id = int(input("Enter Student ID: "))
-            query = "SELECT * FROM Student_MedicalConditions WHERE StudentID = %s"
+            query = "SELECT * FROM Student_Courses WHERE StudentID = %s"
             cursor.execute(query, (student_id))
             result = cursor.fetchall()
             if result == None:
-                print("Medical Condition does not exist")
+                print("Course does not exist")
                 continue
-            print("Medical Condition Information: ")
+            print("Course Information: ")
             for row in result:
-                print("Medical Condition:", row['MedicalConditions'])
+                print("Course:", row['CoursesStudyingID'])
         elif choice == 5:
+            return
+        else:
+            print("Invalid choice")
+
+
+def student_emergency(con, cursor):
+    while True:
+        print("1. Add Emergency Contact")
+        print("2. Delete Emergency Contact")
+        print("3. Update Emergency Contact")
+        print("4. View Emergency Contacts of a Student")
+        print("5. View Emergency Contact Information")
+        print("6. Go Back")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            try:
+                query = "INSERT INTO Student_Emergency VALUES (%s, %s, %s)"
+                student_id = int(input("Enter Student ID: "))
+                name = input("Enter the Emergency Contact's Name: ")
+                code = input("Enter the Emergency Contact's Telephone Code: ")
+                if code == '':
+                    code = 91
+                else:
+                    code = int(code)
+                number = int(
+                    input("Enter the Emergency Contact's Telephone Number: "))
+                cursor.execute(query, (student_id, name, code, number))
+                con.commit()
+                print("Emergency Contact added successfully")
+            except Exception as e:
+                con.rollback()
+                print(e)
+                continue
+        elif choice == 2:
+            try:
+                student_id = int(input("Enter Student ID: "))
+                name = input("Enter the Emergency Contact's Name: ")
+                query = "DELETE FROM Student_Emergency WHERE Name = %s AND StudentID = %s"
+                cursor.execute(query, (name, student_id))
+                con.commit()
+                print("Emergency Contact deleted successfully")
+            except Exception as e:
+                con.rollback()
+                print(e)
+                continue
+        elif choice == 3:
+            try:
+                student_id = int(input("Enter Student ID: "))
+                name = input("Enter the Emergency Contact's Name: ")
+                upd_row = dict()
+                query = "SELECT * FROM Student_Emergency WHERE Name = %s AND StudentID = %s"
+                cursor.execute(query, (name, student_id))
+                result = cursor.fetchone()
+                if result == None:
+                    print("Emergency Contact does not exist")
+                    continue
+                print("Emergency Contact Information: ")
+                print(
+                    "Press ENTER if no update is required, otherwise enter the new value: ")
+                upd_row['Name'] = input("Name: ")
+                if upd_row['Name'] == '':
+                    upd_row['Name'] = result['Name']
+                upd_row['CountryCode'] = input("Country Code")
+                if upd_row['CountryCode'] == '':
+                    upd_row['CountryCode'] = result['CountryCode']
+                else:
+                    upd_row['CountryCode'] = int(upd_row['CountryCode'])
+                upd_row['PhoneNumber'] = input("Phone Number: ")
+                if upd_row['PhoneNumber'] == '':
+                    upd_row['PhoneNumber'] = result['PhoneNumber']
+                else:
+                    upd_row['PhoneNumber'] = int(upd_row['PhoneNumber'])
+                query = "UPDATE Student_Emergency SET Name = %s, CountryCode = %s, PhoneNumber = %s WHERE Name = %s AND StudentID = %s"
+                cursor.execute(
+                    query, (upd_row['Name'], upd_row['CountryCode'], upd_row['PhoneNumber'], name, student_id))
+                con.commit()
+                print("Emergency Contact updated successfully")
+            except Exception as e:
+                con.rollback()
+                print(e)
+                continue
+        elif choice == 4:
             student_id = int(input("Enter Student ID: "))
-            email = input("Enter the Student's Email ID: ")
-            query = "SELECT * FROM Student_MedicalConditions;"
-            cursor.execute(query)
+            query = "SELECT * FROM Student_Emergency WHERE StudentID = %s"
+            cursor.execute(query, (student_id))
             result = cursor.fetchall()
             if result == None:
-                print("Email does not exist")
+                print("Emergency Contact does not exist")
                 continue
-            else:
-                for row in result:
-                    print("Student ID:", row['StudentID'])
-                    print("Medical Condition:", row['MedicalConditions'])
+            print("Emergency Contact Information: ")
+            for row in result:
+                print(row)
+        elif choice == 5:
+            student_id = int(input("Enter Student ID: "))
+            name = int(input("Enter Name: "))
+            query = "SELECT * FROM Student_Emergency WHERE Name = %s AND StudentID = %s"
+            cursor.execute(query, (name, student_id))
+            result = cursor.fetchone()
+            if result == None:
+                print("Emergency Contact does not exist")
+                continue
+            print("Emergency Contact Information: ")
+            print("Student ID: ", result['StudentID'])
+            print("Name: ", result['Name'])
+            print("Country Code: ", result['CountryCode'])
+            print("Phone Number: ", result['PhoneNumber'])
         elif choice == 6:
             return
         else:
