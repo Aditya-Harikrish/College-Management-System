@@ -27,13 +27,15 @@ def admin():
     print("Edit an entity: ")
     print("1. Student")
     print("2. Staff")
-    print("3. Course")
+    print("3. Courses and Classrooms")
     print("4. Exit")
     ch = int(input("Enter your choice: "))
     if ch == 1:
         student(con, cur)
     elif ch == 2:
         staff(con, cur)
+    elif ch == 3:
+        course(con, cur)
 
 
 def user_login(user_id, user_password):

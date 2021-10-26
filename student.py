@@ -109,6 +109,7 @@ def student(con, cursor):
                         break
                 con.commit()
                 print("Student added successfully")
+
             except Exception as e:
                 con.rollback()
                 print(e)
@@ -146,7 +147,7 @@ def student(con, cursor):
                     continue
                 print("\nUpdate Student Information")
                 print(
-                    "Press ENTER if no update is required, otherwise enter the new value: ")
+                    "Press ENTER if no update is required, otherwise enter the new value.\n")
                 upd_row['FirstName'] = input("1. First Name: ")
                 if upd_row['FirstName'] == '':
                     upd_row['FirstName'] = result['FirstName']
@@ -383,6 +384,7 @@ def guardian(con, cursor):
         else:
             print("Invalid choice")
 
+
 def student_contact(con, cursor):
     while True:
         print("1. Add Student Contact Number")
@@ -446,7 +448,8 @@ def student_contact(con, cursor):
                 else:
                     upd_row['CountryCode'] = int(upd_row['CountryCode'])
                 query = "UPDATE StudentContactNumber SET PhoneNumber = %s, CountryCode = %s WHERE PhoneNumber = %s AND StudentID = %s"
-                cursor.execute(query, (upd_row['PhoneNumber'], upd_row['CountryCode'], num, student_id))
+                cursor.execute(
+                    query, (upd_row['PhoneNumber'], upd_row['CountryCode'], num, student_id))
                 con.commit()
                 print("Contact updated successfully")
             except Exception as e:
@@ -480,6 +483,7 @@ def student_contact(con, cursor):
             return
         else:
             print("Invalid choice")
+
 
 def student_email(con, cursor):
     while True:
@@ -567,6 +571,7 @@ def student_email(con, cursor):
         else:
             print("Invalid choice")
 
+
 def student_medical_conditions(con, cursor):
     while True:
         print("1. Add Student Medical Conditions")
@@ -618,7 +623,8 @@ def student_medical_conditions(con, cursor):
                 if upd_row['MedicalConditions'] == '':
                     upd_row['MedicalConditions'] = result['MedicalConditions']
                 query = "UPDATE Student_MedicalConditions SET MedicalConditions = %s WHERE MedicalConditions = %s AND StudentID = %s"
-                cursor.execute(query, (upd_row['MedicalConditions'], medi, student_id))
+                cursor.execute(
+                    query, (upd_row['MedicalConditions'], medi, student_id))
                 con.commit()
                 print("Medical Conditions updated successfully")
             except Exception as e:
