@@ -185,9 +185,9 @@ def student(con, cursor):
                 upd_row['House'] = input("10. House: ")
                 if upd_row['House'] == '':
                     upd_row['House'] = result['House']
-                query = "UPDATE Student SET StudentID = %s, FirstName = %s, LastName = %s, Year = %s, StreamName = %s, Address = %s, Aadhaar = %s, NumberOfCourses = %s, DOB = %s, EnrollmentDate = %s, House = %s"
+                query = "UPDATE Student SET StudentID = %s, FirstName = %s, LastName = %s, Year = %s, StreamName = %s, Address = %s, Aadhaar = %s, NumberOfCourses = %s, DOB = %s, EnrollmentDate = %s, House = %s WHERE StudentID = %s"
                 cursor.execute(query, (student_id, upd_row['FirstName'], upd_row['LastName'], upd_row['Year'], upd_row['StreamName'],
-                                       upd_row['Address'], upd_row['Aadhaar'], upd_row['NumberOfCourses'], upd_row['DOB'], upd_row['EnrollmentDate'], upd_row['House']))
+                                       upd_row['Address'], upd_row['Aadhaar'], upd_row['NumberOfCourses'], upd_row['DOB'], upd_row['EnrollmentDate'], upd_row['House'], student_id))
                 con.commit()
                 print("Student updated successfully")
             except Exception as e:
