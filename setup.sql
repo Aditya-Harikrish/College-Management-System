@@ -28,6 +28,12 @@ CREATE TABLE Student (
     PRIMARY KEY(StudentID)
 );
 
+CREATE TABLE Course (
+    CourseID varchar(6) , 
+    Credits int UNSIGNED,
+    PRIMARY KEY(CourseID)
+);
+
 CREATE TABLE Guardian (
     FirstName varchar(50) NOT NULL,
     LastName varchar(50),
@@ -36,13 +42,18 @@ CREATE TABLE Guardian (
     CountryCode int UNSIGNED NOT NULL DEFAULT 91,
     PhoneNumber BIGINT UNSIGNED NOT NULL,
     EmailID varchar(255) NOT NULL CHECK(INSTR(EmailID, '@') > 0),
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(FirstName, LastName, StudentID)
+    
 );
 
 CREATE TABLE StudentAge (
     StudentID int UNSIGNED NOT NULL,
     DOB date NOT NULL,
     Age int UNSIGNED NOT NULL,
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID)
 );
 
@@ -50,18 +61,24 @@ CREATE TABLE StudentContactNumber (
     StudentID int UNSIGNED,
     CountryCode int UNSIGNED DEFAULT 91,
     PhoneNumber BIGINT UNSIGNED,
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, CountryCode, PhoneNumber)
 );
 
 CREATE TABLE StudentEmailID (
     StudentID int UNSIGNED,
     EmailID varchar(255) CHECK(INSTR(EmailID, '@') > 0),
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, EmailID)
 );
 
 CREATE TABLE Student_MedicalConditions (
     StudentID int UNSIGNED,
     MedicalConditions varchar(500) CHECK(MedicalConditions REGEXP '^[A-Za-z0-9 ]+$'),
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, MedicalConditions)
 );
 
@@ -70,13 +87,19 @@ CREATE TABLE Student_Emergency (
     Name varchar(100) CHECK(Name REGEXP '^[A-Za-z ]+$'),
     CountryCode int UNSIGNED NOT NULL DEFAULT 91,
     PhoneNumber BIGINT UNSIGNED NOT NULL,
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, Name)
 );
 
 CREATE TABLE Student_Courses (
     StudentID int UNSIGNED,
-    CoursesStudyingID varchar(6),
+    CoursesStudyingID varchar(6) ,
     -- check if in Course table
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (CoursesStudyingID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, CoursesStudyingID)
 );
 
@@ -101,6 +124,8 @@ CREATE TABLE StaffAge (
     StaffID int UNSIGNED,
     DOB date NOT NULL,
     Age int UNSIGNED NOT NULL,
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID)
 );
 
@@ -108,12 +133,16 @@ CREATE TABLE StaffContactNumber (
     StaffID int UNSIGNED,
     CountryCode int UNSIGNED DEFAULT 91,
     PhoneNumber BIGINT UNSIGNED,
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, CountryCode, PhoneNumber)
 );
 
 CREATE TABLE StaffEmailID (
     StaffID int UNSIGNED,
     EmailID varchar(255) CHECK(INSTR(EmailID, '@') > 0),
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, EmailID)
 );
 
@@ -123,25 +152,35 @@ CREATE TABLE StaffDesignation (
         Designation IN ('Teacher', 'Teaching Assistant', 'Support staff')
     ),
     -- at least one fellow must be 'admin'
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, Designation)
 );
 
 CREATE TABLE StaffMedicalConditions (
     StaffID int UNSIGNED,
     MedicalConditions varchar(500) CHECK(MedicalConditions REGEXP '^[A-Za-z0-9 ]+$'),
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, MedicalConditions)
 );
 
 CREATE TABLE Staff_Qualifications (
     StaffID int UNSIGNED,
     Qualifications varchar(500) CHECK(Qualifications REGEXP '^[A-Za-z0-9 ,]+$'),
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, Qualifications)
 );
 
 CREATE TABLE Teacher (
     StaffID int UNSIGNED,
-    CoursesTeachingID varchar(6),
+    CoursesTeachingID varchar(6) ,
     -- check
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (CoursesTeachingID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, CoursesTeachingID)
 );
 
@@ -150,25 +189,35 @@ CREATE TABLE TeachingAssistant (
     -- check
     StudentID int UNSIGNED,
     -- check
-    CourseID varchar(6),
+    CourseID varchar(6) ,
     -- check
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (CourseID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, StudentID, CourseID)
 );
 
 CREATE TABLE Classroom (
-    ClassroomID int,
+    ClassroomID int CHECK(
+        ClassroomID >= 10000
+        AND ClassroomID < 100000
+    ),
     BuildingName varchar(50) NOT NULL,
     -- check
     PRIMARY KEY(ClassroomID)
 );
 
 CREATE TABLE CoursesInClassroom (
-    ClassroomID int CHECK(
-        ClassroomID >= 10000
-        AND ClassroomID < 100000
-    ),
-    CourseID varchar(6),
+    ClassroomID int ,
+    CourseID varchar(6) ,
     -- check
+    FOREIGN KEY (CourseID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (ClassroomID) REFERENCES Classroom (ClassroomID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(ClassroomID, CourseID)
 );
 
@@ -178,7 +227,9 @@ CREATE TABLE Department (
         AND DepartmentID <= 9999
     ),
     Name varchar(100) NOT NULL,
-    HOD_ID int NOT NULL,
+    HOD_ID int UNSIGNED NOT NULL,
+    FOREIGN KEY (HOD_ID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     -- CHECK THAT STAFF ID EXISTS
     PRIMARY KEY(DepartmentID)
 );
@@ -187,29 +238,37 @@ CREATE TABLE WorksForDepartment (
     DepartmentID int,
     -- CHECK IN Department
     StaffID int UNSIGNED,
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     -- check in Staff
+    FOREIGN KEY (DepartmentID) REFERENCES Department (DepartmentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(DepartmentID, StaffID)
 );
 
 CREATE TABLE StudiesInDepartment (
     DepartmentID int,
     -- check
-    StudentID int,
+    StudentID int UNSIGNED,
     -- check
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (DepartmentID) REFERENCES Department (DepartmentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(DepartmentID, StudentID)
 );
 
-CREATE TABLE Course (
-    CourseID varchar(6) CHECK(CourseID REGEXP '^[A-Za-z0-9. ]+$'),
-    Credits int UNSIGNED,
-    PRIMARY KEY(CourseID)
-);
+
 
 CREATE TABLE CoursePrerequisites (
-    CourseID varchar(6),
+    CourseID varchar(6) ,
     -- check
-    Prerequisites varchar(6),
+    Prerequisites varchar(6) ,
     -- CHECK IF EXISTS AS CourseID in Course
+    FOREIGN KEY (CourseID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (Prerequisites) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(CourseID, Prerequisites)
 );
 
@@ -222,6 +281,8 @@ CREATE TABLE Dependent (
     PhoneNumber BIGINT UNSIGNED,
     EmailID varchar(255) CHECK(INSTR(EmailID, '@') > 0),
     Address varchar(500) NOT NULL,
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StaffID, FirstName, LastName)
 );
 
@@ -230,10 +291,14 @@ CREATE TABLE Grade (
         Grade <= 10
         AND GRADE >= 0
     ),
-    CourseID varchar(6),
+    CourseID varchar(6) ,
     -- CHECK
     StudentID int UNSIGNED,
     -- check
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (CourseID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(CourseID, StudentID)
 );
 
@@ -242,6 +307,10 @@ CREATE TABLE Teaches (
     -- check
     StaffID int UNSIGNED,
     -- check
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (StaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, StaffID)
 );
 
@@ -260,6 +329,12 @@ CREATE TABLE Partof (
     -- check
     DepartmentID int,
     -- check
+    FOREIGN KEY (TeacherHOD_ID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (TeacherMember_ID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (DepartmentID) REFERENCES Department (DepartmentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(TeacherHOD_ID, TeacherMember_ID, DepartmentID)
 );
 
@@ -270,6 +345,12 @@ CREATE TABLE MentorAStudent (
     -- check
     DepartmentID int,
     -- check
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (TeacherID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (DepartmentID) REFERENCES Department (DepartmentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, TeacherID, DepartmentID)
 );
 
@@ -278,10 +359,18 @@ CREATE TABLE Lecture (
     -- check
     TeacherID int UNSIGNED,
     -- check
-    CourseID varchar(6),
+    CourseID varchar(6) ,
     -- check
-    ClassroomID int,
+    ClassroomID int ,
     -- check
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (TeacherID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (CourseID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (ClassroomID) REFERENCES Classroom (ClassroomID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(StudentID, TeacherID, CourseID, ClassroomID)
 );
 
@@ -290,10 +379,18 @@ CREATE TABLE InvolvedInACourse (
     -- check
     TeacherID int UNSIGNED,
     -- check
-    CourseID varchar(6),
+    CourseID varchar(6) ,
     -- check
     TeachingAssistantStaffID int UNSIGNED,
     -- check
+    FOREIGN KEY (StudentID) REFERENCES Student (StudentID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (TeacherID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (CourseID) REFERENCES Course (CourseID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
+    FOREIGN KEY (TeachingAssistantStaffID) REFERENCES Staff (StaffID)
+    ON DELETE CASCADE ON UPDATE CASCADE ,
     PRIMARY KEY(
         StudentID,
         TeacherID,
@@ -341,87 +438,87 @@ WHERE
 END //
 DELIMITER ;
 
-DELIMITER //
-CREATE TRIGGER StudentDelete
-AFTER
-    DELETE ON Student FOR EACH ROW BEGIN
-DELETE FROM
-    StudentAge
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    StudentContactNumber
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    StudentEmailID
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    Student_MedicalConditions
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    Student_Emergency
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    Student_Courses
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    TeachingAssistant
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    StudiesInDepartment
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    Guardian
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    Grade
-WHERE
-    StudentID = OLD.StudentID;
-
-DELETE FROM
-    Teaches
-WHERE
-    StudentID = OLD.StudentID;
-
+-- DELIMITER //
+-- CREATE TRIGGER StudentDelete
+-- AFTER
+--     DELETE ON Student FOR EACH ROW BEGIN
 -- DELETE FROM
---     Enrolled
+--     StudentAge
 -- WHERE
 --     StudentID = OLD.StudentID;
 
-DELETE FROM
-    MentorAStudent
-WHERE
-    StudentID = OLD.StudentID;
+-- DELETE FROM
+--     StudentContactNumber
+-- WHERE
+--     StudentID = OLD.StudentID;
 
-DELETE FROM
-    Lecture
-WHERE
-    StudentID = OLD.StudentID;
+-- DELETE FROM
+--     StudentEmailID
+-- WHERE
+--     StudentID = OLD.StudentID;
 
-DELETE FROM
-    InvolvedInACourse
-WHERE
-    StudentID = OLD.StudentID;
+-- DELETE FROM
+--     Student_MedicalConditions
+-- WHERE
+--     StudentID = OLD.StudentID;
 
-END //
-DELIMITER ;
+-- DELETE FROM
+--     Student_Emergency
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     Student_Courses
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     TeachingAssistant
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     StudiesInDepartment
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- -- DELETE FROM
+-- --     Guardian
+-- -- WHERE
+-- --     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     Grade
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     Teaches
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- -- DELETE FROM
+-- --     Enrolled
+-- -- WHERE
+-- --     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     MentorAStudent
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     Lecture
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- DELETE FROM
+--     InvolvedInACourse
+-- WHERE
+--     StudentID = OLD.StudentID;
+
+-- END //
+-- DELIMITER ;
 
 DELIMITER //
 CREATE TRIGGER StaffInsert
@@ -462,89 +559,89 @@ WHERE
 END //
 DELIMITER ;
 
-DELIMITER //
-CREATE TRIGGER StaffDelete
-AFTER
-    DELETE ON Staff FOR EACH ROW BEGIN
-DELETE FROM
-    StaffAge
-WHERE
-    StaffID = OLD.StaffID;
+-- DELIMITER //
+-- CREATE TRIGGER StaffDelete
+-- AFTER
+--     DELETE ON Staff FOR EACH ROW BEGIN
+-- DELETE FROM
+--     StaffAge
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    StaffContactNumber
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     StaffContactNumber
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    StaffEmailID
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     StaffEmailID
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    StaffDesignation
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     StaffDesignation
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    StaffMedicalConditions
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     StaffMedicalConditions
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    Staff_Qualifications
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     Staff_Qualifications
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    Teacher
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     Teacher
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    TeachingAssistant
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     TeachingAssistant
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    WorksForDepartment
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     WorksForDepartment
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    Dependent
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     Dependent
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    Teaches
-WHERE
-    StaffID = OLD.StaffID;
+-- DELETE FROM
+--     Teaches
+-- WHERE
+--     StaffID = OLD.StaffID;
 
-DELETE FROM
-    Partof
-WHERE
-    TeacherHOD_ID = OLD.StaffID
-    OR TeacherMember_ID = OLD.StaffID;
+-- DELETE FROM
+--     Partof
+-- WHERE
+--     TeacherHOD_ID = OLD.StaffID
+--     OR TeacherMember_ID = OLD.StaffID;
 
-DELETE FROM
-    MentorAStudent
-WHERE
-    TeacherID = OLD.StaffID;
+-- DELETE FROM
+--     MentorAStudent
+-- WHERE
+--     TeacherID = OLD.StaffID;
 
-DELETE FROM
-    Lecture
-WHERE
-    TeacherID = OLD.StaffID;
+-- DELETE FROM
+--     Lecture
+-- WHERE
+--     TeacherID = OLD.StaffID;
 
-DELETE FROM
-    InvolvedInACourse
-WHERE
-    TeacherID = OLD.StaffID
-    OR TeachingAssistantStaffID = OLD.StaffID;
+-- DELETE FROM
+--     InvolvedInACourse
+-- WHERE
+--     TeacherID = OLD.StaffID
+--     OR TeachingAssistantStaffID = OLD.StaffID;
 
-END //
-DELIMITER ;
+-- END //
+-- DELIMITER ;
 
 -- DELIMITER //
 -- CREATE TRIGGER TeacherInsert
@@ -621,6 +718,96 @@ values
         '2020-08-17',
         'blue'
     );
+INSERT INTO
+    Staff
+VALUES
+    (
+        NULL,
+        'Radha',
+        'Reddy',
+        50000.0,
+        8452136598754567,
+        845213659875,
+        'Gachibowli, Hyderabad',
+        '1980-07-17',
+        '2000-06-01',
+        'permanent'
+    );
+
+INSERT INTO
+    Staff
+VALUES
+    (
+        NULL,
+        'BG',
+        'Garg',
+        90000.0,
+        5642317894567891,
+        456798365147,
+        'Santacruz West, Mumbai',
+        '1970-09-14',
+        '1996-12-08',
+        'permanent'
+    );
+
+INSERT INTO
+    Staff
+VALUES
+    (
+        NULL,
+        'Siddant',
+        'Malhotra',
+        95000.0,
+        7894556423167891,
+        458967893214,
+        'Dharavi, Mumbai',
+        '1975-02-01',
+        '2005-11-29',
+        'temporary'
+    );
+
+INSERT INTO
+    Staff
+VALUES
+    (
+        NULL,
+        'Aaron',
+        'Monis',
+        2000.0,
+        4589317856421789,
+        845213659875,
+        '23 Dasa Road, Dubai',
+        '2002-01-20',
+        '2021-07-31',
+        'temporary'
+    );
+
+INSERT INTO
+    Course
+VALUES
+    ('CS01.3', 2);
+
+INSERT INTO
+    Course
+VALUES
+    ('ISS1.3', 2);
+
+INSERT INTO
+    Course
+VALUES
+    ('DSA1.3', 2);
+
+INSERT INTO
+    Classroom
+VALUES
+    (10001,'GyanBhavan');
+
+INSERT INTO
+    Department
+VALUES
+    (1001,'Science Department',2);
+
+
 
 INSERT INTO
     StudentContactNumber
@@ -742,69 +929,7 @@ VALUES
         "AvadaKedavra@gmail.com"
     );
 
-INSERT INTO
-    Staff
-VALUES
-    (
-        NULL,
-        'Radha',
-        'Reddy',
-        50000.0,
-        8452136598754567,
-        845213659875,
-        'Gachibowli, Hyderabad',
-        '1980-07-17',
-        '2000-06-01',
-        'permanent'
-    );
 
-INSERT INTO
-    Staff
-VALUES
-    (
-        NULL,
-        'BG',
-        'Garg',
-        90000.0,
-        5642317894567891,
-        456798365147,
-        'Santacruz West, Mumbai',
-        '1970-09-14',
-        '1996-12-08',
-        'permanent'
-    );
-
-INSERT INTO
-    Staff
-VALUES
-    (
-        NULL,
-        'Siddant',
-        'Malhotra',
-        95000.0,
-        7894556423167891,
-        458967893214,
-        'Dharavi, Mumbai',
-        '1975-02-01',
-        '2005-11-29',
-        'temporary'
-    );
-
-INSERT INTO
-    Staff
-VALUES
-    (
-        NULL,
-        'Aaron',
-        'Monis',
-        2000.0,
-        4589317856421789,
-        845213659875,
-        '23 Dasa Road, Dubai',
-        '2002-01-20',
-        '2021-07-31',
-        'temporary'
-    );
 
 INSERT INTO
     StaffContactNumber
@@ -901,10 +1026,7 @@ INSERT INTO
 VALUES
     (4, 1, "ISS1.3");
 
-INSERT INTO
-    Classroom
-VALUES
-    (10001,'GyanBhavan');
+
 
 INSERT INTO
     CoursesInClassroom
@@ -921,10 +1043,7 @@ INSERT INTO
 VALUES
     (10001,'CS01.3');
 
-INSERT INTO
-    Department
-VALUES
-    (1001,'Science Department',2);
+
 
 INSERT INTO
     WorksForDepartment
@@ -941,20 +1060,7 @@ INSERT INTO
 VALUES
     (1001,3);
 
-INSERT INTO
-    Course
-VALUES
-    ('CSO1.3', 2);
 
-INSERT INTO
-    Course
-VALUES
-    ('ISS1.3', 2);
-
-INSERT INTO
-    Course
-VALUES
-    ('DSA1.3', 2);
 
 INSERT INTO
     CoursePrerequisites
@@ -990,17 +1096,17 @@ VALUES
 INSERT INTO
     Grade
 VALUES
-    (9.7,'CSO1.3', 2);
+    (9.7,'CS01.3', 2);
 
 INSERT INTO
     Grade
 VALUES
-    (9.3,'CSO1.3', 1);
+    (9.3,'CS01.3', 1);
 
 INSERT INTO
     Grade
 VALUES
-    (9.5,'CSO1.3', 3);
+    (9.5,'CS01.3', 3);
 
 INSERT INTO Teaches (StudentID,StaffID)
 SELECT DISTINCT Student_Courses.StudentID , Teacher.StaffID
